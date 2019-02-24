@@ -1,41 +1,32 @@
 #include <fstream>
 #include <vector>
-
 #include <Windows.h>
 #include <d3d11.h>
 
 struct VERTEX {
-
 	float x;
 	float y;
 	float z;
-
 };
 
 #pragma region Global Variables:
-
-bool isRunning = false;
-constexpr int windowWidth = 800;
-constexpr int windowHeight = 600;
-VERTEX verticies[] = { { 0.0f, 0.5f, 0.0f }, { 0.45f, -0.5f, 0.0f }, { -0.45f, -0.5f, 0.0f }, };
-
+	bool isRunning = false;
+	constexpr int windowWidth = 800;
+	constexpr int windowHeight = 600;
+	VERTEX verticies[] = { { 0.0f, 0.5f, 0.0f }, { 0.45f, -0.5f, 0.0f }, { -0.45f, -0.5f, 0.0f }, };
 #pragma endregion
 
 LRESULT CALLBACK WindowProcedure(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam) {
 	
 	switch (message)
 	{
-	case WM_CLOSE: {
-		DestroyWindow(windowHandle);
-		isRunning = false;
-		break;
-	}
-	case WM_DESTROY: {
-		PostQuitMessage(0);
-		break;
-	}
-	default:
-		break;
+		case WM_CLOSE: {
+			DestroyWindow(windowHandle);
+			isRunning = false;
+			break;
+		}
+		default:
+			break;
 	}
 	
 	return DefWindowProc(windowHandle, message, wParam, lParam);
@@ -44,28 +35,31 @@ LRESULT CALLBACK WindowProcedure(HWND windowHandle, UINT message, WPARAM wParam,
 int WINAPI WinMain(HINSTANCE appInstance, HINSTANCE prevInst, char* cmdArgs, int cmdShow) {
 
 #pragma region Declerations:
-	ID3D11Device*								device = nullptr;
-	ID3D11DeviceContext*						deviceContext = nullptr;
-	IDXGISwapChain*								swapChain = nullptr;
-	ID3D11RenderTargetView*						renderTarget = nullptr;
-	ID3D11Buffer*								vertexBuffer = nullptr;
-	ID3D11VertexShader*							vertexShader = nullptr;
-	ID3D11PixelShader*							pixelShader = nullptr;
-	ID3D11InputLayout*							inputLayout = nullptr;
+	HWND						mainWindowHandle;
+	ID3D11Device*					device = nullptr;
+	ID3D11DeviceContext*				deviceContext = nullptr;
+	IDXGISwapChain*					swapChain = nullptr;
+	ID3D11RenderTargetView*				renderTarget = nullptr;
+	ID3D11Buffer*					vertexBuffer = nullptr;
+	ID3D11VertexShader*				vertexShader = nullptr;
+	ID3D11PixelShader*				pixelShader = nullptr;
+	ID3D11InputLayout*				inputLayout = nullptr;
 #pragma endregion
 
 //========================================================================================================================
 
-#pragma region Window Creation
-	isRunning = true;
-	WNDCLASS wc = { 0 };
-	wc.hInstance = appInstance;
-	wc.lpfnWndProc = WindowProcedure;
-	wc.lpszClassName = "ClassName";
-	wc.style = CS_OWNDC;
-	RegisterClass(&wc);
-	HWND mainWindowHandle = CreateWindow("ClassName", "TheDonkeyFartBox", WS_OVERLAPPED|WS_SYSMENU|WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight, nullptr, nullptr, appInstance, nullptr);
-	ShowWindow(mainWindowHandle, SW_SHOW);
+#pragma region Create Window:
+	{
+		isRunning = true;
+		WNDCLASS wc = { 0 };
+		wc.hInstance = appInstance;
+		wc.lpfnWndProc = WindowProcedure;
+		wc.lpszClassName = "ClassName";
+		wc.style = CS_OWNDC;
+		RegisterClass(&wc);
+		mainWindowHandle = CreateWindow("ClassName", "Output Window", WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight, nullptr, nullptr, appInstance, nullptr);
+		ShowWindow(mainWindowHandle, SW_SHOW);
+	}
 #pragma endregion
 
 #pragma region Create Device and SwapChain:
@@ -129,13 +123,15 @@ int WINAPI WinMain(HINSTANCE appInstance, HINSTANCE prevInst, char* cmdArgs, int
 #pragma endregion
 
 #pragma region Setting up Viewport:
-	D3D11_VIEWPORT viewport = { 0 };
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = windowWidth;
-	viewport.Height = windowHeight;
+	{
+		D3D11_VIEWPORT viewport = { 0 };
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = windowWidth;
+		viewport.Height = windowHeight;
 
-	deviceContext->RSSetViewports(1, &viewport);
+		deviceContext->RSSetViewports(1, &viewport);
+	}
 #pragma endregion
 
 //========================================================================================================================
@@ -166,7 +162,7 @@ int WINAPI WinMain(HINSTANCE appInstance, HINSTANCE prevInst, char* cmdArgs, int
 		}
 #pragma endregion
 
-#pragma region Render!
+#pragma region Render:
 		{
 			deviceContext->Draw(3, 0);
 			swapChain->Present(1, 0);
